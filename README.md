@@ -13,18 +13,6 @@ RT（ChatGPT refresh_token）、Sub2API 和 CPA（CLIProxyAPI / Codex）凭据�
 - 默认脱敏预览，转换和打包在本机完成，支持保留扩展字段。
 - 自动读取运行电脑的系统 / 环境代理，也支持直连和自定义代理。
 
-## 运行截图
-
-以下截图使用虚构账号与模拟 OAuth 响应演示，不包含真实 Token 或本机代理信息。
-
-工具主界面：
-
-![GPT 转换工具主界面](docs/images/desktop.png)
-
-RT → CPA 联网转换结果，默认脱敏预览：
-
-![RT 转换为 CPA 的脱敏结果](docs/images/conversion.png)
-
 ## 启动
 
 ### Windows 运行包
