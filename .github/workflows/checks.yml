@@ -1,0 +1,32 @@
+name: Checks
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install backend dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Test converter and OAuth result mapping
+        run: npm test
+      - name: Test backend with mock OAuth responses
+        run: python -m unittest discover -s tests -p test_server.py -v

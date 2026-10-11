@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>GPT 转换工具 · 联网转换</title>
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script src="converter.js" defer></script>
+  <script src="archive.js" defer></script>
+  <script src="online.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <svg class="svg-defs" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+    <symbol id="i-swap" viewBox="0 0 24 24"><path d="M4 7h16m-4-4 4 4-4 4M20 17H4m4-4-4 4 4 4"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V3m-5 5 5-5 5 5M4 15v5h16v-5"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v13m-5-5 5 5 5-5M4 16v5h16v-5"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="13" rx="2"/><path d="M16 8V3H3v13h5"/></symbol>
+    <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 5h7l2 3h9v12H3z"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="m12 3 8 3v6c0 5-8 9-8 9s-8-4-8-9V6z"/><path d="m8 12 3 3 5-6"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="i-code" viewBox="0 0 24 24"><path d="m7 7-5 5 5 5m10-10 5 5-5 5m-3-14-4 22"/></symbol>
+  </svg>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="index.html" aria-label="GPT 转换工具首页"><span class="brand-mark"><svg><use href="#i-swap"/></svg></span><span>GPT 转换工具<span class="brand-version">v1.3</span></span></a>
+      <div class="topbar-right"><span id="modeBadge" class="mode-badge"><span class="status-dot"></span><span>默认联网</span></span><button id="helpButton" class="text-button" type="button">使用说明 <span aria-hidden="true">↗</span></button></div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="intro">
+      <div><div class="eyebrow">GPT ACCOUNT CONVERTER</div><h1>账号格式，一步转换<span class="title-dot">。</span></h1><p>RT、Sub2API、CPA 自由互转。自动联网获取凭据，生成目标格式。</p></div>
+      <div class="format-chain" aria-label="支持 RT、Sub2API 和 CPA 相互转换"><span class="chain-token rt">RT</span><svg><use href="#i-swap"/></svg><span class="chain-token sub2">Sub2API</span><svg><use href="#i-swap"/></svg><span class="chain-token cpa">CPA</span></div>
+    </section>
+
+    <div class="workflow"><span><b>01</b> 添加账号数据</span><span class="workflow-line"></span><span><b>02</b> 选择目标格式</span><span class="workflow-line"></span><span><b>03</b> 下载转换结果</span></div>
+
+    <section class="workbench" aria-label="转换工作区">
+      <article class="panel input-panel">
+        <div class="panel-header"><div class="panel-title"><span class="step-number">01</span><h2>输入数据</h2></div><span id="detectedFormat" class="subtle-badge">等待输入</span></div>
+        <div class="source-row"><label for="sourceFormat">输入格式</label><select id="sourceFormat"><option value="auto">自动识别（推荐）</option><option value="rt">RT 文本</option><option value="sub2">Sub2API JSON</option><option value="cpa">CPA JSON</option></select><button id="clearButton" class="text-button muted" type="button">清空</button></div>
+        <div id="dropZone" class="drop-zone" tabindex="0" role="button" aria-label="选择文件，或将文件拖到此处">
+          <span class="upload-icon"><svg><use href="#i-upload"/></svg></span>
+          <div><strong>拖拽文件到这里，或点击选择</strong><p>JSON / JSONL / TXT / ZIP · 支持多个文件</p></div>
+          <button id="folderButton" class="folder-button" type="button" title="选择整个文件夹"><svg><use href="#i-folder"/></svg><span>文件夹</span></button>
+        </div>
+        <input id="fileInput" type="file" accept=".json,.jsonl,.txt,.zip" multiple hidden>
+        <input id="folderInput" type="file" webkitdirectory multiple hidden>
+        <div id="importedFiles" class="imported-files" hidden></div>
+        <div class="editor-toolbar"><span><span class="editor-dot"></span>或直接粘贴内容</span><span class="sample-group">试试示例 <button type="button" data-example="rt">RT</button><button type="button" data-example="sub2">Sub2</button><button type="button" data-example="cpa">CPA</button></span></div>
+        <div class="editor input-editor"><span class="editor-gutter" aria-hidden="true">1</span><textarea id="inputText" aria-label="输入 RT 文本或 JSON" spellcheck="false" placeholder="在这里粘贴 RT 或 JSON 数据…&#10;&#10;RT：每行一个 refresh_token&#10;Sub2API：包含 accounts 的 JSON&#10;CPA：type 为 codex 的凭据 JSON&#10;&#10;也支持 JSON 数组和多个账号文件。"></textarea></div>
+        <div class="editor-footer"><span id="inputCount">0 字符</span><span>支持混合格式批量导入</span></div>
+        <div class="input-actions"><label class="check-label"><input id="deduplicate" type="checkbox" checked>自动去重</label><button id="convertButton" class="primary-button" type="button">联网转换<svg><use href="#i-arrow"/></svg><kbd>Ctrl ↵</kbd></button></div>
+      </article>
+
+      <article class="panel output-panel">
+        <div class="panel-header"><div class="panel-title"><span class="step-number">02</span><h2>转换结果</h2></div><span id="resultBadge" class="subtle-badge">准备就绪</span></div>
+        <div class="target-tabs" role="tablist" aria-label="目标格式"><button type="button" role="tab" data-target="rt" aria-selected="false"><b>RT</b><small>Token 文本</small></button><button type="button" role="tab" data-target="sub2" aria-selected="true" class="active"><b>Sub2API</b><small>账号导入 JSON</small></button><button type="button" role="tab" data-target="cpa" aria-selected="false"><b>CPA</b><small>独立凭据 JSON</small></button></div>
+        <div class="output-description"><span id="targetDescription">合并为一个 JSON，可在 Sub2API「导入数据」中使用。</span></div>
+        <div class="editor-toolbar output-toolbar"><span id="outputFilename">sub2api-accounts.json</span><button id="revealButton" class="text-button muted" type="button" aria-pressed="false"><svg><use href="#i-eye"/></svg>显示 Token</button></div>
+        <div class="editor output-editor"><div id="emptyOutput" class="empty-output"><span class="empty-icon"><svg><use href="#i-code"/></svg></span><strong>转换结果将在这里显示</strong><p>添加数据，选择目标格式，然后开始转换。</p><span class="empty-tags"><span>RT</span><svg><use href="#i-swap"/></svg><span>Sub2API</span><svg><use href="#i-swap"/></svg><span>CPA</span></span></div><textarea id="outputText" aria-label="转换结果预览" spellcheck="false" readonly hidden></textarea></div>
+        <div class="editor-footer"><span id="outputCount">0 个账号</span><span id="previewNote">Token 默认隐藏</span></div>
+        <div class="output-actions"><button id="copyButton" class="secondary-button" type="button" disabled><svg><use href="#i-copy"/></svg>复制结果</button><button id="downloadButton" class="download-button" type="button" disabled><svg><use href="#i-download"/></svg><span>下载 JSON</span></button></div>
+      </article>
+    </section>
+
+    <div class="options-bar"><div class="options-title"><svg><use href="#i-shield"/></svg><span>凭据仅发往 OpenAI</span><span class="options-divider"></span><span class="options-note">转换完成后请保存最新 RT</span></div><label class="check-label" title="保留原有代理、调度和扩展字段，便于转回原格式"><input id="preserveExtra" type="checkbox" checked>保留扩展字段</label><details class="advanced-options"><summary>Sub2 默认设置</summary><div><label>并发数<input id="concurrency" type="number" min="1" max="1000" value="10"></label><label>优先级<input id="priority" type="number" min="0" max="1000" value="1"></label><small>仅用于新生成的 Sub2 账号；保留原配置时沿用原值。</small></div></details></div>
+
+    <section class="online-panel" aria-label="网络连接"><div class="online-heading"><div><h2>网络连接 <span id="serviceBadge" class="subtle-badge">本机服务未启动</span></h2><p>默认使用系统代理连接 OAuth。检测连接使用虚构 RT，确认网络可达后再转换。</p></div><button id="checkNetworkButton" class="secondary-button" type="button">检测连接</button></div><div class="online-bottom"><span id="serviceNote">请双击「启动工具.bat」打开浏览器页面；需要本机服务才能联网转换。</span><details id="onlineSettings"><summary>网络设置</summary><div class="network-fields"><label>连接方式<select id="networkMode"><option value="auto">系统 / 环境代理（推荐）</option><option value="direct">直接连接</option><option value="proxy">自定义代理</option></select></label><label>代理地址<input id="httpProxyUrl" type="url" placeholder="示例：http://127.0.0.1:7890 或 socks5h://127.0.0.1:1080" disabled autocomplete="off"></label><label>OAuth client_id<input id="oauthClientId" type="text" placeholder="自动使用输入中的 client_id 或 Codex 默认值" autocomplete="off"></label><p>支持 HTTP、HTTPS 和 SOCKS5 代理。HTTP 403 请检查代理出口；RT 已被使用时请导入上次保存的新凭据，未保存则需要重新登录获取。</p></div></details><button id="shutdownButton" class="text-button" type="button" hidden>停止本机服务</button></div><div id="networkResult" class="network-result" role="status" hidden></div><div id="refreshProgress" class="refresh-progress" hidden><span id="progressText"></span><button id="stopRefreshButton" class="text-button" type="button">停止后续刷新</button></div></section>
+
+    <div id="statusMessage" class="status-message" role="status" aria-live="polite" hidden></div>
+    <section id="reportSection" class="report-section" hidden aria-label="转换报告"><div class="report-header"><h2>转换报告 <span id="reportTotal"></span></h2><button id="detailsButton" class="text-button" type="button">展开详情</button></div><div id="reportStats" class="report-stats"></div><div id="reportDetails" hidden><div class="table-wrap"><table><thead><tr><th>账号</th><th>来源</th><th>RT</th><th>Access Token</th><th>说明</th></tr></thead><tbody id="accountRows"></tbody></table></div><ul id="issueList" class="issue-list"></ul><p id="reportLimit" class="report-limit" hidden>页面仅展示前 200 个账号；下载包含全部转换结果。</p></div></section>
+
+    <div class="format-note"><span class="info-mark">i</span><p><strong>及时保存新凭据</strong><span>RT 刷新可能返回新 RT。工具会更新输入，切换格式复用本次结果；请在关闭页面前下载保存。</span></p></div>
+    <footer><span>本机运行 · 默认联网刷新 · 不使用第三方转换服务</span><span>RT <span class="footer-dot">·</span> Sub2API <span class="footer-dot">·</span> CLIProxyAPI</span></footer>
+  </main>
+
+  <dialog id="helpDialog"><div class="dialog-header"><h2>使用说明</h2><button id="closeHelp" class="text-button" type="button" aria-label="关闭说明">关闭 ×</button></div><div class="dialog-body"><ol><li>粘贴内容，或导入多个 JSON、TXT、JSONL 文件。也支持文件夹与 ZIP。</li><li>选择目标格式，点击「联网转换」或 Ctrl / ⌘ + Enter，工具默认通过本机服务使用 RT 获取凭据并转换。</li><li>RT 下载为 TXT，Sub2API 下载为合并 JSON。CPA 每个账号一个 JSON，多个账号下载为 ZIP。</li></ol><p>请双击「启动工具.bat」。需要代理时展开「网络设置」并填写 HTTP、HTTPS 或 SOCKS5 代理地址；client_id 优先取输入凭据，也可手动指定。</p><p>联网刷新成功后，输入会更新为最新凭据，切换格式不会再次刷新。失败项保留原数据并逐项报告；缺少访问令牌或账号 ID 的项目不会生成 CPA / Sub2 占位凭据。新 RT 请及时下载保存；页面刷新会清空输入。「停止后续刷新」会等待已发送的请求完成，再生成已完成的结果。</p><p>CPA 批量结果显示当前文件，使用文件列表切换预览。「复制结果」复制当前文件的完整内容，包含未脱敏 Token。</p><p>自动去重按 Token 与账号 ID 判断，重复项保留字段更完整的一项。取消去重可保留全部输入项。同一批相同 RT / client_id 只刷新一次；本次已经刷新的凭据再次转换时直接复用。</p><p>「保留扩展字段」把源格式独有的配置放入 <code>_gpt_converter</code> 扩展，便于转回。目标服务重新导出时可能移除扩展。RT 文本只包含 refresh_token。</p><p>格式转换在浏览器本地完成。联网转换时 RT 通过本机服务发往 <code>auth.openai.com/oauth/token</code>，不上传到第三方转换网站。本机服务不将凭据写入磁盘或请求日志，只在内存中短时缓存新旧 RT 对应的成功结果以避免重复轮换；停止服务后清空缓存。页面不使用浏览器存储保存账号。</p><p>「检测连接」发送虚构 RT，不发送输入中的凭据。检测显示 HTTP 401 且 OAuth 服务可达，是网络正常的结果；HTTP 403 表示出口或网络验证被拒绝。RT 已被使用无法通过更换代理恢复，请使用最新凭据或重新登录。</p><p>仅支持 OpenAI / ChatGPT OAuth 账号。单文件最多 20 MB，导入内容合计最多 64 MB，每次最多 5000 个账号。ZIP 支持 Store / Deflate，不支持加密、分卷或 ZIP64。推荐新版 Chrome / Edge。</p><p>GitHub 参考项目见同目录 <code>README.md</code>。示例 Token 为虚构数据，不会成功刷新。</p></div></dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>

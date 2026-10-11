@@ -1,0 +1,11 @@
+{
+  "type": "codex",
+  "email": "demo002@example.com",
+  "account_id": "demo-account-002",
+  "refresh_token": "rt_DEMO_ONLY_not_a_real_token_002",
+  "access_token": "DEMO_ACCESS_TOKEN_NOT_REAL_002",
+  "id_token": "",
+  "last_refresh": "2026-01-01T00:00:00Z",
+  "expired": "2030-01-01T00:00:00Z",
+  "plan_type": "free"
+}

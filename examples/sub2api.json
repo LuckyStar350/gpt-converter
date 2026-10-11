@@ -1,0 +1,23 @@
+{
+  "type": "sub2api-data",
+  "version": 1,
+  "exported_at": "2026-01-01T00:00:00Z",
+  "proxies": [],
+  "accounts": [
+    {
+      "name": "演示账号",
+      "platform": "openai",
+      "type": "oauth",
+      "credentials": {
+        "email": "demo001@example.com",
+        "chatgpt_account_id": "demo-account-001",
+        "refresh_token": "rt_DEMO_ONLY_not_a_real_token_001",
+        "access_token": "DEMO_ACCESS_TOKEN_NOT_REAL_001",
+        "expires_at": "2030-01-01T00:00:00Z",
+        "plan_type": "plus"
+      },
+      "concurrency": 10,
+      "priority": 1
+    }
+  ]
+}

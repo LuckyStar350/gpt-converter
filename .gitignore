@@ -1,0 +1,35 @@
+# Local packages and generated build files
+/gpt-converter-server.exe
+/gpt-converter.zip
+/dist/
+/build/
+.test-artifacts/
+.reference/
+
+# Python caches and virtual environments
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+ENV/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Editor and operating-system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Local environment and exported account credentials
+.env
+.env.*
+!.env.example
+refresh-tokens*.txt
+cpa-accounts*.zip
+sub2api-accounts*.json
+/auth.json
+/codex-*.json
