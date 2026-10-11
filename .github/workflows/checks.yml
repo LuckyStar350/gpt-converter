@@ -29,4 +29,4 @@ jobs:
       - name: Test converter and OAuth result mapping
         run: npm test
       - name: Test backend with mock OAuth responses
-        run: python -m unittest discover -s tests -p test_server.py -v
+        run: python -m unittest discover -s tests -p "test_*.py" -v

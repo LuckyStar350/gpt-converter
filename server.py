@@ -19,8 +19,10 @@ import time
 from urllib import error, parse, request
 import webbrowser
 from curl_cffi import requests as curl_requests
+from windows_startup import StartupLock
+from windows_tray import WindowsTray
 
-VERSION = '1.3.0'
+VERSION = '1.3.1'
 SERVICE_ID = 'local-gpt-converter'
 CLIENT_ID = 'app_EMoamEEZ73f0CkXaXp7hrann'
 TOKEN_URL = 'https://auth.openai.com/oauth/token'
@@ -241,6 +243,8 @@ def cached_access_is_fresh(result):
 
 class ConverterServer(ThreadingHTTPServer):
     daemon_threads = True
+    # Windows SO_REUSEADDR allows several listeners on one port. Keep one owner.
+    allow_reuse_address = sys.platform != 'win32'
 
     def __init__(self, address, refresh_fn=refresh_oauth):
         super().__init__(address, Handler)
@@ -250,6 +254,13 @@ class ConverterServer(ThreadingHTTPServer):
         self.cache_lock = threading.Lock()
         self.token_locks = [threading.Lock() for _ in range(64)]
         self.refresh_slots = threading.BoundedSemaphore(3)
+        self.startup_lock = None
+
+    def service_actions(self):
+        # Release startup coordination only after the HTTP loop accepts requests.
+        if self.startup_lock is not None:
+            self.startup_lock.release()
+            self.startup_lock = None
 
     def refresh(self, payload):
         options = validate_options(payload)
@@ -405,44 +416,75 @@ class Handler(BaseHTTPRequestHandler):
             self.send_json(500, {'error': '本机刷新服务处理失败'})
 
 
-def main():
+def show_startup_error(message):
+    print(message, file=sys.stderr, flush=True)
+    if sys.platform == 'win32':
+        import ctypes
+        from ctypes import wintypes
+        user32 = ctypes.WinDLL('user32', use_last_error=True)
+        user32.MessageBoxW.argtypes = [wintypes.HWND, wintypes.LPCWSTR, wintypes.LPCWSTR, wintypes.UINT]
+        user32.MessageBoxW.restype = ctypes.c_int
+        user32.MessageBoxW(None, message, 'GPT 转换工具', 0x10)
+
+
+def main(argv=None):
     parser = argparse.ArgumentParser(description='Local GPT converter and OAuth refresh bridge')
     parser.add_argument('--port', type=int, default=8765)
     parser.add_argument('--open', action='store_true', help='Open the local page in the default browser')
-    args = parser.parse_args()
+    parser.add_argument('--no-tray', action='store_true', help='Disable the Windows tray for headless diagnostics')
+    args = parser.parse_args(argv)
     if not 1 <= args.port <= 65515:
         parser.error('port must be between 1 and 65515')
     server = None
-    for port in range(args.port, args.port + 20):
-        url = f'http://127.0.0.1:{port}'
-        try:
-            server = ConverterServer(('127.0.0.1', port))
-            break
-        except OSError:
-            try:
-                opener = request.build_opener(request.ProxyHandler({}))
-                with opener.open(url + '/api/health', timeout=1) as response:
-                    health = json.load(response)
-                if health.get('service') == SERVICE_ID and health.get('project_id') == PROJECT_ID and health.get('version') == VERSION:
-                    if args.open:
-                        webbrowser.open(url)
-                    print(f'Already running: {url}', flush=True)
-                    return
-            except (ValueError, OSError, error.URLError):
-                pass
-    if server is None:
-        raise SystemExit('No available local port; close an old instance and try again.')
-    print(f'GPT converter: {url} (local only)', flush=True)
-    if args.open:
-        webbrowser.open(url)
+    tray = None
+    startup = StartupLock(f'Local\\GPTConverter-{PROJECT_ID}')
     try:
+        startup.acquire()
+        for port in range(args.port, args.port + 20):
+            url = f'http://127.0.0.1:{port}'
+            try:
+                server = ConverterServer(('127.0.0.1', port))
+                break
+            except OSError:
+                try:
+                    opener = request.build_opener(request.ProxyHandler({}))
+                    with opener.open(url + '/api/health', timeout=1) as response:
+                        health = json.load(response)
+                    if health.get('service') == SERVICE_ID and health.get('project_id') == PROJECT_ID and health.get('version') == VERSION:
+                        if args.open:
+                            webbrowser.open(url)
+                        print(f'Already running: {url}', flush=True)
+                        return 0
+                except (ValueError, OSError, error.URLError):
+                    pass
+        if server is None:
+            raise RuntimeError('没有可用的本机端口，请关闭旧服务后重试。')
+        server.startup_lock = startup
+        if sys.platform == 'win32' and not args.no_tray:
+            tray = WindowsTray(lambda: webbrowser.open(url), server.shutdown, icon_path=ROOT / 'icon.ico')
+            tray.start()
+        print(f'GPT converter: {url} (local only)', flush=True)
+        if args.open:
+            webbrowser.open(url)
         server.serve_forever(poll_interval=0.2)
     except KeyboardInterrupt:
         pass
+    except (OSError, RuntimeError) as exc:
+        show_startup_error(f'无法启动 GPT 转换工具：{exc}\n工具未继续在后台运行，请修复后重新启动。')
+        return 1
     finally:
-        server.server_close()
-        server.cache.clear()
+        try:
+            if server is not None:
+                server.server_close()
+                server.cache.clear()
+        finally:
+            try:
+                if tray is not None:
+                    tray.stop()
+            finally:
+                startup.release()
+    return 0
 
 
 if __name__ == '__main__':
-    main()
+    raise SystemExit(main())

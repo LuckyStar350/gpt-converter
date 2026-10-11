@@ -2,7 +2,7 @@
 
 RT（ChatGPT refresh_token）、Sub2API 和 CPA（CLIProxyAPI / Codex）凭据的本地转换工具，支持六个转换方向，默认通过本机服务联网刷新 OAuth 凭据。
 
-当前版本：**1.3.0** · [MIT 许可证](LICENSE)
+当前版本：**1.3.1** · [MIT 许可证](LICENSE)
 
 ## 功能
 
@@ -17,9 +17,11 @@ RT（ChatGPT refresh_token）、Sub2API 和 CPA（CLIProxyAPI / Codex）凭据�
 
 ### Windows 运行包
 
-从项目的 GitHub Releases 下载 `gpt-converter-windows-v1.3.0.zip`（需要维护者先发布运行包），完整解压后双击 **启动工具.bat**。运行包包含 EXE，无需安装 Python 或 Node.js。`start.ps1` 是启动入口调用的辅助脚本。
+从项目的 GitHub Releases 下载 `gpt-converter-windows-v1.3.1.zip`，完整解压后双击 **启动工具.bat**。运行包包含 EXE，无需安装 Python 或 Node.js。`start.ps1` 是启动入口调用的辅助脚本。
 
 服务仅监听本机，通常打开 `http://127.0.0.1:8765`；端口占用时会选择后续端口。重复启动同版本工具会打开现有服务。
+
+Windows 启动后会在系统托盘显示工具图标（可能收在任务栏的「显示隐藏的图标」中）。双击图标打开页面，右键选择「退出工具」可结束后台服务；页面中的「停止本机服务」也能退出。关闭浏览器页面后，服务会继续运行，托盘图标仍可用于打开或退出。
 
 ### 从源码运行
 
@@ -59,7 +61,7 @@ Windows 也可双击 `启动工具.bat`，脚本会优先使用同目录 EXE，�
 
 ```sh
 npm test
-python -m unittest discover -s tests -p test_server.py -v
+python -m unittest discover -s tests -p "test_*.py" -v
 ```
 
 前端测试使用 Node.js 24，后端使用 Python 3.11。CI 使用虚构凭据和模拟 OAuth，不提交真实 RT。

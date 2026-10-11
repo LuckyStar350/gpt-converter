@@ -24,7 +24,7 @@ EXCLUDED_SUFFIXES = {
 }
 RUNTIME_FILES = {
     "index.html", "styles.css", "app.js", "converter.js", "archive.js",
-    "online.js", "icon.svg", "server.py", "requirements.txt", "package.json",
+    "online.js", "icon.svg", "icon.ico", "server.py", "windows_tray.py", "windows_startup.py", "requirements.txt", "package.json",
     "启动工具.bat", "start.ps1", "start.sh", "README.md", "LICENSE",
     "SECURITY.md", "CONTRIBUTING.md", "CHANGELOG.md",
 }
@@ -104,6 +104,7 @@ def build_executable(root: Path, output_dir: Path) -> Path:
     subprocess.run([
         sys.executable, "-m", "PyInstaller", "--noconfirm", "--clean", "--onefile",
         "--name", Path(EXECUTABLE).stem,
+        "--icon", str(root / "icon.ico"),
         "--collect-binaries", "curl_cffi", "--collect-data", "certifi",
         "--distpath", str(build_dir / "dist"),
         "--workpath", str(build_dir / "work"),

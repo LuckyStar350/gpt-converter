@@ -350,7 +350,7 @@
       const response = await fetch('/api/health', { cache: 'no-store', signal: AbortSignal.timeout(3000) });
       const health = await response.json();
       if (!response.ok || health.service !== 'local-gpt-converter') return;
-      if (health.version !== '1.3.0') { $('serviceNote').textContent = '本机仍运行旧版本，请关闭旧服务后重新双击「启动工具.bat」。'; return; }
+      if (health.version !== '1.3.1') { $('serviceNote').textContent = '本机仍运行旧版本，请关闭旧服务后重新双击「启动工具.bat」。'; return; }
       state.bridgeKey = health.session_key;
       $('serviceBadge').textContent = '本机服务已连接';
       $('serviceBadge').className = 'subtle-badge ready';

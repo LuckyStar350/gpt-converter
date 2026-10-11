@@ -4,7 +4,7 @@
 
 ## 源码准备
 
-确认 `.gitignore` 已生效，再将需要发布的源码加入暂存区。不要添加个人账号、Token、代理密码、截图、日志或机器配置。`examples/` 与测试使用虚构凭据。
+确认 `.gitignore` 已生效，再将需要发布的源码加入暂存区。不要添加个人账号、Token、代理密码、包含私人信息的截图、日志或机器配置。`examples/` 与测试使用虚构凭据。
 
 制作可分享的源码包：
 
@@ -12,7 +12,7 @@
 python scripts/build_release.py --source-only
 ```
 
-生成 `dist/gpt-converter-source-v1.3.0.zip`。脚本从 Git 跟踪 / 暂存清单读取文件，包含其当前工作区内容；EXE、其他 ZIP 与本机生成目录不会写入源码包。生成物由 `.gitignore` 排除。
+生成 `dist/gpt-converter-source-v1.3.1.zip`。脚本从 Git 跟踪 / 暂存清单读取文件，包含其当前工作区内容；EXE、其他 ZIP 与本机生成目录不会写入源码包。生成物由 `.gitignore` 排除。
 
 ## Windows 运行包
 
@@ -23,9 +23,9 @@ python -m pip install -r requirements-dev.txt
 python scripts/build_release.py
 ```
 
-生成 `dist/gpt-converter-windows-v1.3.0.zip`，运行包内只有一个 Windows 启动入口：`启动工具.bat`。构建过程不覆盖根目录下正在使用的 EXE。
+生成 `dist/gpt-converter-windows-v1.3.1.zip`，运行包内只有一个 Windows 启动入口：`启动工具.bat`。构建过程不覆盖根目录下正在使用的 EXE。
 
-完整解压到任意目录，双击启动入口，检查页面连接、格式转换与下载。联网检测使用虚构 RT；实际账号刷新仍需有效 RT 和可达网络。
+完整解压到任意目录，双击启动入口，检查页面连接、格式转换与下载，以及系统托盘的打开和退出菜单。退出后确认后台进程结束。联网检测使用虚构 RT；实际账号刷新仍需有效 RT 和可达网络。
 
 ## GitHub 构建
 

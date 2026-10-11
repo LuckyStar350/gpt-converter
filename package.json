@@ -1,6 +1,6 @@
 {
   "name": "local-gpt-token-converter",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "private": true,
   "license": "MIT",
   "description": "RT / Sub2API / CPA converter with OAuth refresh by default",
