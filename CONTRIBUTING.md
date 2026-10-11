@@ -7,3 +7,5 @@
 路径从项目目录动态计算，代理从运行电脑的配置读取。请使用通用示例说明配置，避免写入自己的用户名、机器绝对路径和网络地址。
 
 EXE、ZIP、参考项目和测试产物由忽略规则排除。发布产物使用 `scripts/build_release.py` 或 GitHub Actions 生成。
+
+更新公开运行截图时，安装开发依赖并运行 `python scripts/capture_screenshots.py`。该脚本使用独立本机服务、虚构账号和模拟 OAuth，不读取当前机器的代理配置。生成到 `docs/images/`，检查图像内容后再提交。
